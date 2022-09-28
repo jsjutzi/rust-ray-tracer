@@ -1,6 +1,8 @@
 mod vec;
 mod ray;
 mod sphere;
+mod hit; 
+
 use std::{io::{stderr, Write}};
 use vec::{Vec3, Point3, Color};
 use ray::Ray;
