@@ -1,16 +1,16 @@
+mod camera;
 mod hit;
 mod ray;
 mod sphere;
 mod vec;
-mod camera;
 
 use camera::Camera;
 use hit::{Hit, World};
+use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
 use std::io::{stderr, Write};
 use vec::{Color, Point3, Vec3};
-use rand::{thread_rng, Rng};
 
 fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
     if depth <= 0 {
@@ -18,8 +18,8 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+    if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
+        let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
         let r = Ray::new(rec.p, target - rec.p);
         0.5 * ray_color(&r, world, depth - 1)
     } else {
