@@ -94,6 +94,15 @@ impl Vec3 {
             (-1.0) * in_unit_sphere
         }
     }
+
+    pub fn near_zero(self) -> bool {
+        const EPS: f64 = 1.0e-8;
+        self[0].abs() < EPS && self[1].abs() < EPS && self[2].abs() < EPS
+    }
+
+    pub fn reflect(self, n: Vec3) -> Vec3 {
+        self - 2.0 * self.dot(n) * n
+    }
 }
 
 impl Index<usize> for Vec3 {
@@ -170,6 +179,16 @@ impl Mul<Vec3> for f64 {
     fn mul(self, other: Vec3) -> Vec3 {
         Vec3 {
             e: [self * other[0], self * other[1], self * other[2]],
+        }
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Vec3 {
+        Vec3 {
+            e: [self[0] * other[0], self[1] * other[1], self[2] * other[2]]
         }
     }
 }

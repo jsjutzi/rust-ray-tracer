@@ -11,7 +11,7 @@ use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
 use std::io::{stderr, Write};
-use vec::{Color, Point3, Vec3};
+use vec::{Color, Point3};
 
 fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
     if depth <= 0 {
@@ -20,9 +20,11 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
     }
 
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
-        let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
-        let r = Ray::new(rec.p, target - rec.p);
-        0.5 * ray_color(&r, world, depth - 1)
+        if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
+            attenuation * ray_color(&scattered, world, depth - 1)
+        } else {
+            Color::new(0.0, 0.0, 0.0)
+        }
     } else {
         let unit_direction = r.direction();
         let t = 0.5 * (unit_direction.y() + 1.0);
