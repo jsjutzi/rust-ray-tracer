@@ -1,20 +1,18 @@
 use super::hit::HitRecord;
 use super::ray::Ray;
-use super::vec::{Vec3, Color};
+use super::vec::{Color, Vec3};
 
 pub trait Scatter {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)>;
 }
 
 pub struct Lambertian {
-    albedo: Color
+    albedo: Color,
 }
 
 impl Lambertian {
     pub fn new(a: Color) -> Lambertian {
-        Lambertian { 
-            albedo: a 
-        }
+        Lambertian { albedo: a }
     }
 }
 
@@ -28,22 +26,20 @@ impl Scatter for Lambertian {
         }
 
         let scattered = Ray::new(rec.p, scatter_direction);
-        
+
         Some((self.albedo, scattered))
     }
 }
 
+// Add support for metal material
 pub struct Metal {
     albedo: Color,
-    fuzz: f64
+    fuzz: f64,
 }
 
 impl Metal {
     pub fn new(a: Color, f: f64) -> Metal {
-        Metal {
-            albedo: a,
-            fuzz: f
-        }
+        Metal { albedo: a, fuzz: f }
     }
 }
 
@@ -57,5 +53,34 @@ impl Scatter for Metal {
         } else {
             None
         }
+    }
+}
+
+// Add support for dielectric material
+pub struct Dielectric {
+    ir: f64,
+}
+
+impl Dielectric {
+    pub fn new(index_of_refraction: f64) -> Dielectric {
+        Dielectric {
+            ir: index_of_refraction,
+        }
+    }
+}
+
+impl Scatter for Dielectric {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+        let refraction_ratio = if rec.front_face {
+            1.0 / self.ir
+        } else {
+            self.ir
+        };
+
+        let unit_direction = r_in.direction();
+        let refracted = unit_direction.refract(rec.normal, refraction_ratio);
+        let scattered = Ray::new(rec.p, refracted);
+
+        Some((Color::new(1.0, 1.0, 1.0), scattered))
     }
 }

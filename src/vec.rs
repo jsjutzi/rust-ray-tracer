@@ -103,6 +103,13 @@ impl Vec3 {
     pub fn reflect(self, n: Vec3) -> Vec3 {
         self - 2.0 * self.dot(n) * n
     }
+
+    pub fn refract(self, n: Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = ((-1.0) * self).dot(n).min(1.0);
+        let r_out_perp = etai_over_etat * (self + cos_theta * n);
+        let r_out_parallel = -(1.0 - r_out_perp.length().powi(2)).abs().sqrt() * n;
+        r_out_perp + r_out_parallel
+    }
 }
 
 impl Index<usize> for Vec3 {
@@ -188,7 +195,7 @@ impl Mul<Vec3> for Vec3 {
 
     fn mul(self, other: Vec3) -> Vec3 {
         Vec3 {
-            e: [self[0] * other[0], self[1] * other[1], self[2] * other[2]]
+            e: [self[0] * other[0], self[1] * other[1], self[2] * other[2]],
         }
     }
 }
