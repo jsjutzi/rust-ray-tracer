@@ -155,6 +155,14 @@ impl SubAssign for Vec3 {
     }
 }
 
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, other: f64) -> () {
+        *self = Vec3 {
+            e: [self[0] * other, self[1] * other, self[2] * other],
+        };
+    }
+}
+
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
@@ -162,14 +170,6 @@ impl Mul<f64> for Vec3 {
         Vec3 {
             e: [self[0] * other, self[1] * other, self[2] * other],
         }
-    }
-}
-
-impl MulAssign<f64> for Vec3 {
-    fn mul_assign(&mut self, other: f64) -> () {
-        *self = Vec3 {
-            e: [self[0] * other, self[1] * other, self[2] * other],
-        };
     }
 }
 
