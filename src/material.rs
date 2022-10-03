@@ -69,6 +69,8 @@ impl Dielectric {
     }
 }
 
+// TODO: Need further debugging.  Refraction from glass surfaces is not working as expected,
+//       although formulas seem correct after triple checks.  Need to understand refraction math deeply to go forward.
 impl Scatter for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let refraction_ratio = if rec.front_face {
