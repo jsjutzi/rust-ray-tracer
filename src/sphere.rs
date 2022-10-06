@@ -29,7 +29,7 @@ impl Hit for Sphere {
         let c = oc.length().powi(2) - self.radius.powi(2);
 
         let discriminant = half_b.powi(2) - a * c;
-        
+
         if discriminant < 0.0 {
             return None;
         }
@@ -44,10 +44,9 @@ impl Hit for Sphere {
             }
         }
 
-        let p = r.at(root);
         let mut rec = HitRecord {
             t: root,
-            p: p,
+            p: r.at(root),
             mat: self.mat.clone(),
             normal: Vec3::new(0.0, 0.0, 0.0),
             front_face: false,

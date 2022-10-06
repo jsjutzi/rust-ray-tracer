@@ -30,7 +30,7 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
             Color::new(0.0, 0.0, 0.0)
         }
     } else {
-        let unit_direction = r.direction();
+        let unit_direction = r.direction().normalized();
         let t = 0.5 * (unit_direction.y() + 1.0);
         (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
     }
@@ -48,6 +48,7 @@ fn main() {
     let mut world = World::new();
 
     // Define material properties
+
     let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let mat_center = Rc::new(Dielectric::new(1.5));
     let mat_left = Rc::new(Dielectric::new(1.5));

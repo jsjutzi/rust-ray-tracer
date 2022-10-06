@@ -48,6 +48,10 @@ impl Vec3 {
         }
     }
 
+    pub fn normalized(self) -> Vec3 {
+        self / self.length()
+    }
+
     pub fn format_color(self, samples_per_pixel: u64) -> String {
         let ir = (256.0
             * (self[0] / (samples_per_pixel as f64))
