@@ -46,10 +46,7 @@ impl Metal {
 impl Scatter for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let reflected = r_in.direction().reflect(rec.normal).normalized();
-        let scattered = Ray::new(
-            rec.p,
-            reflected + self.fuzz * Vec3::random_in_unit_sphere(),
-        );
+        let scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_in_unit_sphere());
 
         if scattered.direction().dot(rec.normal) > 0.0 {
             Some((self.albedo, scattered))
@@ -72,8 +69,6 @@ impl Dielectric {
     }
 }
 
-// TODO: Need further debugging.  Refraction from glass surfaces is not working as expected,
-//       although formulas seem correct after triple checks.  Need to understand refraction math deeply to go forward.
 impl Scatter for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let refraction_ratio = if rec.front_face {
@@ -83,8 +78,16 @@ impl Scatter for Dielectric {
         };
 
         let unit_direction = r_in.direction().normalized();
-        let refracted = unit_direction.refract(rec.normal, refraction_ratio);
-        let scattered = Ray::new(rec.p, refracted);
+        let cos_theta = ((-1.0) * unit_direction).dot(rec.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
+
+        let direction = if refraction_ratio * sin_theta > 1.0 {
+            unit_direction.reflect(rec.normal)
+        } else {
+            unit_direction.refract(rec.normal, refraction_ratio)
+        };
+
+        let scattered = Ray::new(rec.p, direction);
 
         Some((Color::new(1.0, 1.0, 1.0), scattered))
     }
