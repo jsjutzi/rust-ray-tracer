@@ -52,7 +52,7 @@ impl Hit for Sphere {
             front_face: false,
         };
 
-        let outward_normal = (rec.p - self.center) / self.radius.abs();
+        let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
 
         Some(rec)
