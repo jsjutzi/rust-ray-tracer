@@ -29,7 +29,6 @@ impl Hit for Sphere {
         let c = oc.length().powi(2) - self.radius.powi(2);
 
         let discriminant = half_b.powi(2) - a * c;
-
         if discriminant < 0.0 {
             return None;
         }
@@ -52,7 +51,7 @@ impl Hit for Sphere {
             front_face: false,
         };
 
-        let outward_normal = (rec.p - self.center) / self.radius.abs();
+        let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
 
         Some(rec)

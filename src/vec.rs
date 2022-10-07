@@ -17,7 +17,6 @@ impl Vec3 {
     pub fn new(e0: f64, e1: f64, e2: f64) -> Vec3 {
         Vec3 { e: [e0, e1, e2] }
     }
-
     pub fn x(self) -> f64 {
         self[0]
     }
@@ -68,8 +67,9 @@ impl Vec3 {
 
         format!("{} {} {}", ir, ig, ib)
     }
+
     pub fn random(r: Range<f64>) -> Vec3 {
-        let mut rng = thread_rng();
+        let mut rng = rand::thread_rng();
 
         Vec3 {
             e: [
@@ -106,13 +106,6 @@ impl Vec3 {
 
     pub fn reflect(self, n: Vec3) -> Vec3 {
         self - 2.0 * self.dot(n) * n
-    }
-
-    pub fn refract(self, n: Vec3, etai_over_etat: f64) -> Vec3 {
-        let cos_theta = (-1.0 * self).dot(n).min(1.0);
-        let r_out_perp = etai_over_etat * (self + cos_theta * n);
-        let r_out_parallel = -(1.0 - r_out_perp.length().powi(2)).abs().sqrt() * n;
-        r_out_perp + r_out_parallel
     }
 }
 
@@ -166,14 +159,6 @@ impl SubAssign for Vec3 {
     }
 }
 
-impl MulAssign<f64> for Vec3 {
-    fn mul_assign(&mut self, other: f64) -> () {
-        *self = Vec3 {
-            e: [self[0] * other, self[1] * other, self[2] * other],
-        };
-    }
-}
-
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
@@ -181,6 +166,14 @@ impl Mul<f64> for Vec3 {
         Vec3 {
             e: [self[0] * other, self[1] * other, self[2] * other],
         }
+    }
+}
+
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, other: f64) -> () {
+        *self = Vec3 {
+            e: [self[0] * other, self[1] * other, self[2] * other],
+        };
     }
 }
 
@@ -199,7 +192,7 @@ impl Mul<Vec3> for Vec3 {
 
     fn mul(self, other: Vec3) -> Vec3 {
         Vec3 {
-            e: [self[0] * other[0], self[1] * other[1], self[2] * other[2]],
+            e: [self[0] * other[0], self[1] * other[1], self[1] * other[2]],
         }
     }
 }
@@ -224,6 +217,6 @@ impl DivAssign<f64> for Vec3 {
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}, {}, {}", self[0], self[1], self[2])
+        write!(f, "({}, {}, {})", self[0], self[1], self[2])
     }
 }

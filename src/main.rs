@@ -6,23 +6,23 @@ mod sphere;
 mod vec;
 
 use camera::Camera;
-use hit::{Hit, World};
-use material::{Dielectric, Lambertian, Metal};
 use rand::{thread_rng, Rng};
-use ray::Ray;
-use sphere::Sphere;
 use std::{
     io::{stderr, Write},
     rc::Rc,
 };
-use vec::{Color, Point3};
+
+use hit::{Hit, World};
+use material::{Lambertian, Metal};
+use ray::Ray;
+use sphere::Sphere;
+use vec::{Color, Point3, Vec3};
 
 fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
     if depth <= 0 {
-        // If we exceed the bounce limit, no more light will be gathered
+        // If we've exceeded the ray bounce limit, no more light is gathered
         return Color::new(0.0, 0.0, 0.0);
     }
-
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
         if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
             attenuation * ray_color(&scattered, world, depth - 1)
@@ -46,34 +46,40 @@ fn main() {
 
     // World
     let mut world = World::new();
-
-    // Define material properties
-
+    
     let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let mat_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let mat_left = Rc::new(Dielectric::new(1.5));
-    let mat_left_inner = Rc::new(Dielectric::new(1.5));
-    let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+    let mat_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let mat_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
 
     let sphere_ground = Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, mat_ground);
     let sphere_center = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, mat_center);
     let sphere_left = Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, mat_left);
-    let sphere_left_inner = Sphere::new(Point3::new(-1.0, 0.0, -1.0), -0.4, mat_left_inner);
     let sphere_right = Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, mat_right);
 
     world.push(Box::new(sphere_ground));
     world.push(Box::new(sphere_center));
     world.push(Box::new(sphere_left));
-    world.push(Box::new(sphere_left_inner));
     world.push(Box::new(sphere_right));
+
     // Camera
+    let viewport_height = 2.0;
+    let viewport_width = ASPECT_RATIO * viewport_height;
+    let focal_length = 1.0;
+
+    let origin = Point3::new(0.0, 0.0, 0.0);
+    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
+    let vertical = Vec3::new(0.0, viewport_height, 0.0);
+    let lower_left_corner =
+        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
+
     let cam = Camera::new();
 
     println!("P3");
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
 
-    let mut rng = thread_rng();
+    let mut rng = rand::thread_rng();
 
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines remaining: {:3}", IMAGE_HEIGHT - j - 1);
