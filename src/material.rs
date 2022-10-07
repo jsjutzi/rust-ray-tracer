@@ -27,7 +27,7 @@ impl Scatter for Lambertian {
         }
 
         let scattered = Ray::new(rec.p, scatter_direction);
-
+        
         Some((self.albedo, scattered))
     }
 }
@@ -49,7 +49,7 @@ impl Scatter for Metal {
         let reflected = r_in.direction().reflect(rec.normal).normalized();
         let scattered = Ray::new(
             rec.p,
-            reflected + self.fuzz * Vec3::random_in_unit_sphere().normalized(),
+            reflected + self.fuzz * Vec3::random_in_unit_sphere(),
         );
 
         if scattered.direction().dot(rec.normal) > 0.0 {
