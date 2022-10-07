@@ -192,7 +192,7 @@ impl Mul<Vec3> for Vec3 {
 
     fn mul(self, other: Vec3) -> Vec3 {
         Vec3 {
-            e: [self[0] * other[0], self[1] * other[1], self[1] * other[2]],
+            e: [self[0] * other[0], self[1] * other[1], self[2] * other[2]],
         }
     }
 }
